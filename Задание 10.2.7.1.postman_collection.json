@@ -1,0 +1,285 @@
+{
+	"info": {
+		"_postman_id": "8f32bab9-d833-4818-9790-7ece7086221c",
+		"name": "Задание 10.2.7.1",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28243514"
+	},
+	"item": [
+		{
+			"name": "Получение ключа",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Если в ответе есть key, то записать ключ в переменную\", function () {\r",
+							"    let jsonData = JSON.parse(responseBody)\r",
+							"    pm.expect(jsonData).to.have.all.keys(\"key\");\r",
+							"    pm.collectionVariables.set(\"auth_key\", jsonData.key)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "email",
+						"value": "vakarian.2000@mail.ru",
+						"type": "text"
+					},
+					{
+						"key": "password",
+						"value": "06Vodka",
+						"type": "text"
+					},
+					{
+						"key": "auth_key",
+						"value": "05465961fa2ccefac67d50bd4993c658bdb67a259a30232ab6331bde",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/key",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"key"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Создание нового питомца",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Проверка статус-кода 200 и запись ID в переменную\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    let jsonData = pm.response.json();\r",
+							"    pm.collectionVariables.set(\"petid\", jsonData.id);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "name",
+							"value": "{{name}}",
+							"type": "text"
+						},
+						{
+							"key": "animal_type",
+							"value": "{{type}}",
+							"type": "text"
+						},
+						{
+							"key": "age",
+							"value": "{{age}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/api/create_pet_simple",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"create_pet_simple"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Изменение имени питомца",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Проверка изменения имени питомца и сохранение нового имени\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    let jsonData = pm.response.json();\r",
+							"    \r",
+							"    if (pm.variables.get(\"pet_name\") !== jsonData.name) {\r",
+							"        pm.collectionVariables.set(\"name\", jsonData.name);\r",
+							"    } else {\r",
+							"        pm.test.fail(\"Тест неудачный: Новое имя совпадает со старым\");\r",
+							"    }\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "name",
+							"value": "{{name}}",
+							"type": "text"
+						},
+						{
+							"key": "type",
+							"value": "{{type}}",
+							"type": "text"
+						},
+						{
+							"key": "age",
+							"value": "{{age}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/api/pets/afe1c448-e283-4fb6-95d2-5f14b1c9395c",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"pets",
+						"afe1c448-e283-4fb6-95d2-5f14b1c9395c"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Получение списка своих питомцев",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Проверка списка питомцев и сохранение возраста первого питомца\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    let jsonData = JSON.parse(pm.response.text());\r",
+							"    \r",
+							"    if (jsonData && jsonData.length > 0) {\r",
+							"        pm.collectionVariables.set(\"age_pet\", jsonData[0].age);\r",
+							"    } else {\r",
+							"        pm.collectionVariables.set(\"age_pet\", \"N/A\"); // Или любое другое значение по вашему усмотрению\r",
+							"    }\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/pets?filter=my_pets",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"pets"
+					],
+					"query": [
+						{
+							"key": "filter",
+							"value": "my_pets"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "value",
+				"value": "{{auth_key}}",
+				"type": "string"
+			},
+			{
+				"key": "key",
+				"value": "auth_key",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://petfriends.skillfactory.ru",
+			"type": "string"
+		},
+		{
+			"key": "auth_key",
+			"value": "05465961fa2ccefac67d50bd4993c658bdb67a259a30232ab6331bde",
+			"type": "string"
+		},
+		{
+			"key": "petid",
+			"value": ""
+		},
+		{
+			"key": "age",
+			"value": "2"
+		},
+		{
+			"key": "type",
+			"value": "Собака"
+		},
+		{
+			"key": "name",
+			"value": "Сэм"
+		},
+		{
+			"key": "age_pet",
+			"value": ""
+		}
+	]
+}
